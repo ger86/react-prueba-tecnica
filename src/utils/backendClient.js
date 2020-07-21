@@ -30,25 +30,29 @@ const backendClient = (function () {
     }
     const request = makeRequest(method, `${BACKEND_URL}${path}`, data, requestHeaders);
 
-    const response = await fetch(request);
-    if (response.status === 401) {
-      return new ApiResponse(
-        false,
-        null,
-        response.status,
-        new CredentialsExpiredError('Missing renew token')
-      );
-    } else {
-      let responseData = {};
-      if (response.status !== 204) {
-        responseData = await response.json();
+    try {
+      const response = await fetch(request);
+      if (response.status === 401) {
+        return new ApiResponse(
+          false,
+          null,
+          response.status,
+          new CredentialsExpiredError('Missing renew token')
+        );
+      } else {
+        let responseData = {};
+        if (response.status !== 204) {
+          responseData = await response.json();
+        }
+        return new ApiResponse(
+          response.ok,
+          response.ok ? responseData?.data || responseData : null,
+          response.status,
+          response.ok ? null : new ApiError(responseData?.message, responseData?.data)
+        );
       }
-      return new ApiResponse(
-        response.ok,
-        response.ok ? responseData?.data || responseData : null,
-        response.status,
-        response.ok ? null : new ApiError(responseData?.message, responseData?.data)
-      );
+    } catch (error) {
+      return new ApiResponse(false, null, null, new ApiError(error.message, null));
     }
   };
 
