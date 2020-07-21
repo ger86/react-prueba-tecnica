@@ -1,25 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Suspense} from 'react';
+import {BrowserRouter as Router} from 'react-router-dom';
+import {CssBaseline, ThemeProvider} from '@material-ui/core';
+import {UserContextProvider} from 'contexts/userContext';
+import ErrorBoundary from 'components/common/ErrorBoundary';
+import AppLoading from 'components/common/AppLoading';
+import UserRoutes from 'components/router/UserRoutes';
+import laligaTheme from 'theme/laligaTheme';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={laligaTheme}>
+      <Suspense fallback={<AppLoading />}>
+        <CssBaseline />
+        <Router>
+          <ErrorBoundary>
+            <UserContextProvider>
+              <UserRoutes />
+            </UserContextProvider>
+          </ErrorBoundary>
+        </Router>
+      </Suspense>
+    </ThemeProvider>
   );
 }
 
